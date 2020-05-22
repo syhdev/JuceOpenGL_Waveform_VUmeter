@@ -13,12 +13,12 @@
 #include <JuceHeader.h>
 #include "CircularBuffer.h"
 
-struct Vertex
+struct WVVertex
 {
 	float vertex[3];
 	float value[2];
 
-	Vertex(float vx, float vy, float vz, float valx, float valy)
+	WVVertex(float vx, float vy, float vz, float valx, float valy)
 	{
 		vertex[0] = vx;
 		vertex[1] = vy;
@@ -28,11 +28,11 @@ struct Vertex
 	}
 };
 
-struct Attributes
+struct WVAttributes
 {
 	std::unique_ptr<OpenGLShaderProgram::Attribute> vertex, value;
 
-	Attributes(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
+	WVAttributes(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
 	{
 		vertex.reset(createAttribute(openGLContext, shaderProgram, "vertex"));
 		value.reset(createAttribute(openGLContext, shaderProgram, "value"));
@@ -42,13 +42,13 @@ struct Attributes
 	{
 		if (vertex.get() != nullptr)
 		{
-			openGLContext.extensions.glVertexAttribPointer(vertex->attributeID, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+			openGLContext.extensions.glVertexAttribPointer(vertex->attributeID, 3, GL_FLOAT, GL_FALSE, sizeof(WVVertex), 0);
 			openGLContext.extensions.glEnableVertexAttribArray(vertex->attributeID);
 		}
 
 		if (value.get() != nullptr)
 		{
-			openGLContext.extensions.glVertexAttribPointer(value->attributeID, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(sizeof(float) * 3));
+			openGLContext.extensions.glVertexAttribPointer(value->attributeID, 2, GL_FLOAT, GL_FALSE, sizeof(WVVertex), (GLvoid*)(sizeof(float) * 3));
 			openGLContext.extensions.glEnableVertexAttribArray(value->attributeID);
 		}
 	}
@@ -69,11 +69,11 @@ private:
 	}
 };
 
-struct Uniforms
+struct WVUniforms
 {
 	std::unique_ptr<OpenGLShaderProgram::Uniform> projectionMatrix, viewMatrix, audioData, resolution, texture;
 
-	Uniforms(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
+	WVUniforms(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
 	{
 		projectionMatrix.reset(createUniform(openGLContext, shaderProgram, "projectionMatrix"));
 		viewMatrix.reset(createUniform(openGLContext, shaderProgram, "viewMatrix"));
@@ -96,15 +96,15 @@ private:
 
 };
 
-struct VertexBuffer
+struct WVVertexBuffer
 {
 	GLuint VBO;
 	GLuint EBO;
 	OpenGLContext& openGLContext;
-	Array<Vertex> vertices;
+	Array<WVVertex> vertices;
 	float xx = 1.0;
 
-	VertexBuffer(OpenGLContext& context) : openGLContext(context)
+	WVVertexBuffer(OpenGLContext& context) : openGLContext(context)
 	{
 		openGLContext.extensions.glGenBuffers(1, &VBO);
 		openGLContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -113,7 +113,7 @@ struct VertexBuffer
 		openGLContext.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
 		for (int i = 0; i < 256; i++) {
-			vertices.add(Vertex(i / 256.0f, i / 256.0f, 0.0f, 0.0f, 0.0f));
+			vertices.add(WVVertex(i / 256.0f, i / 256.0f, 0.0f, 0.0f, 0.0f));
 		}
 
 
@@ -125,7 +125,7 @@ struct VertexBuffer
 
 		openGLContext.extensions.glBufferData(
 			GL_ARRAY_BUFFER,
-			static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(Vertex)),
+			static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(WVVertex)),
 			vertices.getRawDataPointer(),
 			GL_STATIC_DRAW);
 
@@ -136,7 +136,7 @@ struct VertexBuffer
 			GL_STATIC_DRAW);
 	}
 
-	~VertexBuffer()
+	~WVVertexBuffer()
 	{
 		openGLContext.extensions.glDeleteBuffers(1, &VBO);
 		openGLContext.extensions.glDeleteBuffers(1, &EBO);
@@ -158,34 +158,34 @@ struct VertexBuffer
 		}
 
 		//for (int i = 0; i < 256; i++) {
-		//	vertices.add(Vertex(2* i / 256.0f - 1.0f, sin(xx * i), 0.0f, 0.0f, 0.0f));
+		//	vertices.add(WVVertex(2* i / 256.0f - 1.0f, sin(xx * i), 0.0f, 0.0f, 0.0f));
 		//}
 
-		vertices.add(Vertex(-1.0, -1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(Vertex(-1.0, 1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(Vertex(1.0, 1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(Vertex(1.0, -1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(WVVertex(-1.0, -1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(WVVertex(-1.0, 1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(WVVertex(1.0, 1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(WVVertex(1.0, -1.0, 0.0f, 0.0f, 0.0f));
 
 
 		openGLContext.extensions.glBufferData(
 			GL_ARRAY_BUFFER,
-			static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(Vertex)),
+			static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(WVVertex)),
 			vertices.getRawDataPointer(),
 			GL_STATIC_DRAW);
 	}
 };
 
-struct Shape
+struct WVShape
 {
-	OwnedArray<VertexBuffer> vertexBuffers;
+	OwnedArray<WVVertexBuffer> vertexBuffers;
 	OpenGLTexture texture;
 	//PixelARGB image[16][16];
 	PixelARGB image[4096];
 	float xx = 1.0f;
 
-	Shape(OpenGLContext& openGLContext)
+	WVShape(OpenGLContext& openGLContext)
 	{
-		vertexBuffers.add(new VertexBuffer(openGLContext));
+		vertexBuffers.add(new WVVertexBuffer(openGLContext));
 
 		
 		/*for (int i = 0; i < 16; i++) 
@@ -203,7 +203,7 @@ struct Shape
 	}
 
 
-	void draw(OpenGLContext& openGLContext, Attributes& glAttributes, GraphicsCircularBuffer<float>* cb)
+	void draw(OpenGLContext& openGLContext, WVAttributes& glAttributes, GraphicsCircularBuffer<float>* cb)
 	{
 		for (auto* vertexBuffer : vertexBuffers)
 		{
@@ -224,7 +224,7 @@ struct Shape
 
 			texture.loadARGB(*image, 16, 16);*/
 
-			if(!cb->isEmpty())
+			/*if(!cb->isEmpty())
 			{
 				SamplesBuffer<float> sb = cb->get();
 				for (int i = 0; i < sb.numSamples; i++)
@@ -234,14 +234,14 @@ struct Shape
 
 				texture.loadARGB(image, sb.numSamples, 1);
 			}
-			else {
+			else {*/
 				for (int i = 0; i < 16; i++)
 				{
 					image[i] = PixelARGB(1, 255 , 128, 0);
 				}
 
 				texture.loadARGB(image, 16, 1);
-			}
+			//}
 			
 
 			texture.bind();
@@ -277,30 +277,21 @@ public:
 	//==============================================================================
 	void paint(Graphics& g) override;
 	void resized() override;
-	//void update() override;
 	//==============================================================================
-	/** Called before rendering OpenGL, after an OpenGLContext has been associated
-		with this OpenGLRenderer (this component is a OpenGLRenderer).
-		Sets up GL objects that are needed for rendering.
-	 */
 	void newOpenGLContextCreated() override;
-
-	/** Called when done rendering OpenGL, as an OpenGLContext object is closing.
-		Frees any GL objects created during rendering.
-	 */
 	void openGLContextClosing() override;
-
 	void renderOpenGL() override;
-
-	GraphicsCircularBuffer<float>* getCircularBuffer() { return &circularBuffer; }
+	//==============================================================================
+	void setCircularBuffer(GraphicsCircularBuffer<float>* cb) { circularBuffer = cb; }
 
 
 private:
-
+	Label title;
+	//==============================================================================
 	std::unique_ptr<OpenGLShaderProgram> shaderProgram;
-	std::unique_ptr<Shape> shape;
-	std::unique_ptr<Attributes> attributes;
-	std::unique_ptr<Uniforms> uniforms;
+	std::unique_ptr<WVShape> shape;
+	std::unique_ptr<WVAttributes> attributes;
+	std::unique_ptr<WVUniforms> uniforms;
 	const char* vertexShader;
 	const char* fragmentShader;
 	void createShaders();
@@ -312,7 +303,7 @@ private:
 	//==============================================================================
 	void drawBackgroundStuff(float desktopScale);
 	//==============================================================================
-	GraphicsCircularBuffer<float> circularBuffer;
+	GraphicsCircularBuffer<float>* circularBuffer;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveformViewer)
 };

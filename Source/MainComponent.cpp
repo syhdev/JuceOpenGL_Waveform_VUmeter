@@ -11,7 +11,9 @@
 //==============================================================================
 MainComponent::MainComponent() :
 	waveformViewer(),
-	state(Stopped)
+	vuMetre(),
+	state(Stopped),
+	circularBuffer(16)
 {
 	// Make sure you set the size of the component after
 	// you add any child components.
@@ -49,10 +51,12 @@ MainComponent::MainComponent() :
 	transportSource.addChangeListener(this);
 
 	addAndMakeVisible(waveformViewer);
+	addAndMakeVisible(vuMetre);
 
 	formatManager.registerBasicFormats();
 
-	circularBuffer = waveformViewer.getCircularBuffer();
+	waveformViewer.setCircularBuffer(&circularBuffer);
+	vuMetre.setCircularBuffer(&circularBuffer);
 }
 
 MainComponent::~MainComponent()
@@ -90,7 +94,7 @@ void MainComponent::getNextAudioBlock(const AudioSourceChannelInfo& bufferToFill
 	}
 
 	transportSource.getNextAudioBlock(bufferToFill);
-	circularBuffer->put(bufferToFill.buffer->getReadPointer(1), bufferToFill.buffer->getNumSamples());
+	circularBuffer.put(bufferToFill.buffer->getReadPointer(1), bufferToFill.buffer->getNumSamples());
 }
 
 void MainComponent::releaseResources()
@@ -118,7 +122,8 @@ void MainComponent::resized()
 	openButton.setBounds(area.removeFromTop(50));
 	playButton.setBounds(area.removeFromTop(50));
 	stopButton.setBounds(area.removeFromTop(50));
-	waveformViewer.setBounds(area);
+	waveformViewer.setBounds(area.removeFromLeft(300));
+	vuMetre.setBounds(area);
 }
 
 void MainComponent::changeState(TransportState newState)

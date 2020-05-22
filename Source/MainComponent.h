@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "WaveformViewer.h"
+#include "VUMetre.h"
 
 //==============================================================================
 /*
@@ -57,7 +58,8 @@ private:
 	void stopButtonClicked();
 	//==============================================================================
 	WaveformViewer waveformViewer;
-	GraphicsCircularBuffer<float>* circularBuffer;
+	VUMetre vuMetre;
+	GraphicsCircularBuffer<float> circularBuffer;
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)

@@ -11,8 +11,7 @@
 #include "VUMetre.h"
 
 //==============================================================================
-VUMetre::VUMetre():
-	circularBuffer(16)
+VUMetre::VUMetre()
 {
 	//Sets the OpenGL version to 3.2
 	glContext.setOpenGLVersionRequired(OpenGLContext::OpenGLVersion::openGL3_2);
@@ -22,17 +21,6 @@ VUMetre::VUMetre():
 
 	setSize(800, 600);
 
-	//addAndMakeVisible(dp);
-	//path.startNewSubPath(Point<float>(5, 5));
-	//path.lineTo(Point<float>(10, 10));
-	//path.lineTo(Point<float>(10, 20));
-	//path.lineTo(Point<float>(50, 20));
-	//path.lineTo(Point<float>(100, 20));
-	//path.closeSubPath();
-	//dp.setPath(path);
-
-	//setFramesPerSecond(24);
-
 	vertexShader =
 #include "vertexShader.glsl"
 		;
@@ -40,6 +28,11 @@ VUMetre::VUMetre():
 	fragmentShader =
 #include "fragmentShader.glsl"
 		;
+
+	addAndMakeVisible(title);
+	title.setText("VU Meter", dontSendNotification);
+	title.setColour(Label::textColourId, Colours::orange);
+	title.setJustificationType(Justification::left);
 }
 
 VUMetre::~VUMetre()
@@ -51,69 +44,22 @@ VUMetre::~VUMetre()
 //==============================================================================
 void VUMetre::paint(Graphics& g)
 {
-
-
-	//g.setColour(cOpBackground);
-	//g.fillAll();
-
-
-
-	/*g.setColour(Colours::aquamarine);
-	g.drawVerticalLine(xx, 0.0, 50.0);
-
-	xx++;
-
-	if (xx > 100) {
-		xx = 0;
-	}*/
-
-	//g.setColour(Colours::white);
-	//g.drawVerticalLine(20, 0.0, 100.0);
-	//g.drawVerticalLine(40, 0.0, 50.0);
-
-	//DBG("paint");
-
-	//float v;
-	//float voffset = 10.0;
-	//SamplesBuffer<float> sb = circularBuffer->get();
-	//g.setColour(Colours::white);
-	//for (int i = 0; i < sb.numSamples; i++) {
-	//	v = sb.buffer[i];
-	//	g.drawVerticalLine(i, 0.0 + voffset, v * 100.0 + voffset + 3.0);
-	//}
 }
 
 void VUMetre::resized()
 {
 	Rectangle<int> area(getLocalBounds());
-	//dp.setBounds(area);
+	title.setBounds(area.removeFromTop(30));
 }
 
-//void WaveformViewer::update()
-//{
-//}
-
-//void WaveformViewer::changeListenerCallback(ChangeBroadcaster * source)
-//{
-//	repaint();
-//}
 
 void VUMetre::newOpenGLContextCreated()
 {
-	DBG("opening GL");
-	// Setup Shaders
 	createShaders();
-
-	// Setup Buffer Objects
-	//glContext.extensions.glGenBuffers(1, &VBO); // Vertex Buffer Object
-	//glContext.extensions.glGenBuffers(1, &EBO); // Vertex Buffer Object
 }
 
 void VUMetre::openGLContextClosing()
 {
-	//shaderProgram->release();
-	//shaderProgram = nullptr;
-	DBG("closing GL");
 	shaderProgram.reset();
 	shape.reset();
 	attributes.reset();
@@ -130,7 +76,8 @@ void VUMetre::renderOpenGL()
 	auto desktopScale = (float)glContext.getRenderingScale();
 	OpenGLHelpers::clear(Colours::azure);
 
-	drawBackgroundStuff(desktopScale);
+	// Draw Juce stuff
+	//drawBackgroundStuff(desktopScale);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -155,17 +102,7 @@ void VUMetre::renderOpenGL()
 	if (uniforms->texture.get() != nullptr)
 		uniforms->texture->set((GLint)0);
 
-	//if (uniforms->audioData.get() != nullptr)
-	//{
-	//	SamplesBuffer<float> sb;
-	//	sb = circularBuffer->get();
-	//	//DBG(sb.buffer[0]);
-	//	//FloatVectorOperations::clear(visualizationBuffer, sb.numSamples);
-	//	//FloatVectorOperations::add(visualizationBuffer, sb.buffer.getReadPointer(i, 0), RING_BUFFER_READ_SIZE);
-	//	uniforms->audioData->set((GLfloat*)sb.buffer, sb.numSamples);
-	//}
-
-	shape->draw(glContext, *attributes, &circularBuffer);
+	shape->draw(glContext, *attributes, circularBuffer);
 
 	// Reset the element buffers so child Components draw correctly
 	glContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -190,9 +127,9 @@ void VUMetre::createShaders()
 		shaderProgram.reset(newShaderProgram.release());
 		shaderProgram->use();
 
-		shape.reset(new Shape(glContext));
-		attributes.reset(new Attributes(glContext, *shaderProgram));
-		uniforms.reset(new Uniforms(glContext, *shaderProgram));
+		shape.reset(new VUShape(glContext));
+		attributes.reset(new VUAttributes(glContext, *shaderProgram));
+		uniforms.reset(new VUUniforms(glContext, *shaderProgram));
 
 		statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
 	}
@@ -229,32 +166,6 @@ void VUMetre::drawBackgroundStuff(float desktopScale)
 		Graphics g(*glRenderer);
 		g.setColour(Colours::darkslategrey);
 		g.fillAll();
-
-		/*xx *= 0.995f;
-		if (xx <= 0.01f) {
-			xx = 1.0f;
-		}*/
-
-		/*for (int i = 0; i < 256; i++) {
-			g.setColour(Colours::orange);
-			g.drawVerticalLine(i, sin(xx * i) * 20.0f+50.0f, getHeight());
-		}*/
-
-		/*path.clear();
-
-		path.startNewSubPath(Point<float>(0, getHeight() / 2));
-		for (int i = 0; i < 256; i++) {
-			path.lineTo(Point<float>(2* i, sin(xx * i) * 40.0f + getHeight()/2));
-		}
-		path.lineTo(Point<float>(2 * 256, getHeight()));
-		path.lineTo(Point<float>(0, getHeight()));
-		path.closeSubPath();
-
-		PathStrokeType stroke(3.0f);
-		g.setColour(Colours::orange.darker(0.2f));
-		g.strokePath(path, stroke);
-		g.setColour(Colours::orange.withAlpha(0.5f));
-		g.fillPath(path);*/
 	}
 }
 

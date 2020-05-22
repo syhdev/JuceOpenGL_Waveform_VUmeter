@@ -11,8 +11,7 @@
 #include "WaveformViewer.h"
 
 //==============================================================================
-WaveformViewer::WaveformViewer():
-	circularBuffer(16)
+WaveformViewer::WaveformViewer()
 {
 	//Sets the OpenGL version to 3.2
 	glContext.setOpenGLVersionRequired(OpenGLContext::OpenGLVersion::openGL3_2);
@@ -21,6 +20,12 @@ WaveformViewer::WaveformViewer():
 	glContext.setContinuousRepainting(true);
 
 	setSize(800, 600);
+
+	addAndMakeVisible(title);
+	title.setText("Waveform Viewer", dontSendNotification);
+	title.setColour(Label::textColourId, Colours::orange);
+	title.setJustificationType(Justification::left);
+
 
 	//addAndMakeVisible(dp);
 	//path.startNewSubPath(Point<float>(5, 5));
@@ -86,6 +91,7 @@ void WaveformViewer::paint(Graphics& g)
 void WaveformViewer::resized()
 {
 	Rectangle<int> area(getLocalBounds());
+	title.setBounds(area.removeFromTop(30));
 	//dp.setBounds(area);
 }
 
@@ -165,7 +171,7 @@ void WaveformViewer::renderOpenGL()
 	//	uniforms->audioData->set((GLfloat*)sb.buffer, sb.numSamples);
 	//}
 
-	shape->draw(glContext, *attributes, &circularBuffer);
+	shape->draw(glContext, *attributes, circularBuffer);
 
 	// Reset the element buffers so child Components draw correctly
 	glContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -190,9 +196,9 @@ void WaveformViewer::createShaders()
 		shaderProgram.reset(newShaderProgram.release());
 		shaderProgram->use();
 
-		shape.reset(new Shape(glContext));
-		attributes.reset(new Attributes(glContext, *shaderProgram));
-		uniforms.reset(new Uniforms(glContext, *shaderProgram));
+		shape.reset(new WVShape(glContext));
+		attributes.reset(new WVAttributes(glContext, *shaderProgram));
+		uniforms.reset(new WVUniforms(glContext, *shaderProgram));
 
 		statusText = "GLSL: v" + String(OpenGLShaderProgram::getLanguageVersion(), 2);
 	}

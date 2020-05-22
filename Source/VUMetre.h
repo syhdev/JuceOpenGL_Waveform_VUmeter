@@ -13,12 +13,12 @@
 #include <JuceHeader.h>
 #include "CircularBuffer.h"
 
-struct Vertex
+struct VUVertex
 {
 	float vertex[3];
 	float value[2];
 
-	Vertex(float vx, float vy, float vz, float valx, float valy)
+	VUVertex(float vx, float vy, float vz, float valx, float valy)
 	{
 		vertex[0] = vx;
 		vertex[1] = vy;
@@ -28,11 +28,11 @@ struct Vertex
 	}
 };
 
-struct Attributes
+struct VUAttributes
 {
 	std::unique_ptr<OpenGLShaderProgram::Attribute> vertex, value;
 
-	Attributes(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
+	VUAttributes(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
 	{
 		vertex.reset(createAttribute(openGLContext, shaderProgram, "vertex"));
 		value.reset(createAttribute(openGLContext, shaderProgram, "value"));
@@ -42,13 +42,13 @@ struct Attributes
 	{
 		if (vertex.get() != nullptr)
 		{
-			openGLContext.extensions.glVertexAttribPointer(vertex->attributeID, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+			openGLContext.extensions.glVertexAttribPointer(vertex->attributeID, 3, GL_FLOAT, GL_FALSE, sizeof(VUVertex), 0);
 			openGLContext.extensions.glEnableVertexAttribArray(vertex->attributeID);
 		}
 
 		if (value.get() != nullptr)
 		{
-			openGLContext.extensions.glVertexAttribPointer(value->attributeID, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)(sizeof(float) * 3));
+			openGLContext.extensions.glVertexAttribPointer(value->attributeID, 2, GL_FLOAT, GL_FALSE, sizeof(VUVertex), (GLvoid*)(sizeof(float) * 3));
 			openGLContext.extensions.glEnableVertexAttribArray(value->attributeID);
 		}
 	}
@@ -69,11 +69,11 @@ private:
 	}
 };
 
-struct Uniforms
+struct VUUniforms
 {
 	std::unique_ptr<OpenGLShaderProgram::Uniform> projectionMatrix, viewMatrix, audioData, resolution, texture;
 
-	Uniforms(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
+	VUUniforms(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
 	{
 		projectionMatrix.reset(createUniform(openGLContext, shaderProgram, "projectionMatrix"));
 		viewMatrix.reset(createUniform(openGLContext, shaderProgram, "viewMatrix"));
@@ -96,47 +96,23 @@ private:
 
 };
 
-struct VertexBuffer
+struct VUVertexBuffer
 {
 	GLuint VBO;
 	GLuint EBO;
 	OpenGLContext& openGLContext;
-	Array<Vertex> vertices;
-	float xx = 1.0;
+	Array<VUVertex> vertices;
 
-	VertexBuffer(OpenGLContext& context) : openGLContext(context)
+	VUVertexBuffer(OpenGLContext& context) : openGLContext(context)
 	{
 		openGLContext.extensions.glGenBuffers(1, &VBO);
 		openGLContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 		openGLContext.extensions.glGenBuffers(1, &EBO);
 		openGLContext.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-		for (int i = 0; i < 256; i++) {
-			vertices.add(Vertex(i / 256.0f, i / 256.0f, 0.0f, 0.0f, 0.0f));
-		}
-
-
-		int indices[2 * 256 - 2];
-		for (int i = 0; i < 255; i++) {
-			indices[2 * i] = i;
-			indices[2 * i + 1] = i + 1;
-		}
-
-		openGLContext.extensions.glBufferData(
-			GL_ARRAY_BUFFER,
-			static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(Vertex)),
-			vertices.getRawDataPointer(),
-			GL_STATIC_DRAW);
-
-		openGLContext.extensions.glBufferData(
-			GL_ELEMENT_ARRAY_BUFFER,
-			sizeof(int) * (2 * 256 - 2),
-			indices,
-			GL_STATIC_DRAW);
 	}
 
-	~VertexBuffer()
+	~VUVertexBuffer()
 	{
 		openGLContext.extensions.glDeleteBuffers(1, &VBO);
 		openGLContext.extensions.glDeleteBuffers(1, &EBO);
@@ -152,77 +128,38 @@ struct VertexBuffer
 	{
 		vertices.clear();
 
-		xx *= 0.995f;
-		if (xx <= 0.01f) {
-			xx = 1.0f;
-		}
-
-		//for (int i = 0; i < 256; i++) {
-		//	vertices.add(Vertex(2* i / 256.0f - 1.0f, sin(xx * i), 0.0f, 0.0f, 0.0f));
-		//}
-
-		vertices.add(Vertex(-1.0, -1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(Vertex(-1.0, 1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(Vertex(1.0, 1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(Vertex(1.0, -1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(VUVertex(-1.0, -1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(VUVertex(-1.0, 1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(VUVertex(1.0, 1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(VUVertex(1.0, -1.0, 0.0f, 0.0f, 0.0f));
 
 
 		openGLContext.extensions.glBufferData(
 			GL_ARRAY_BUFFER,
-			static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(Vertex)),
+			static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(VUVertex)),
 			vertices.getRawDataPointer(),
 			GL_STATIC_DRAW);
 	}
 };
 
-struct Shape
+struct VUShape
 {
-	OwnedArray<VertexBuffer> vertexBuffers;
+	OwnedArray<VUVertexBuffer> vertexBuffers;
 	OpenGLTexture texture;
-	//PixelARGB image[16][16];
 	PixelARGB image[4096];
 	float xx = 1.0f;
 
-	Shape(OpenGLContext& openGLContext)
+	VUShape(OpenGLContext& openGLContext)
 	{
-		vertexBuffers.add(new VertexBuffer(openGLContext));
-
-		
-		/*for (int i = 0; i < 16; i++) 
-		{
-			for (int j = 0; j < 16; j++)
-			{
-				image[i][j] = PixelARGB(1, 255, 0, 0);
-			}
-		}*/
-
-		//texture.loadARGB(*image, 16, 16);
-
-
-
+		vertexBuffers.add(new VUVertexBuffer(openGLContext));
 	}
 
 
-	void draw(OpenGLContext& openGLContext, Attributes& glAttributes, GraphicsCircularBuffer<float>* cb)
+	void draw(OpenGLContext& openGLContext, VUAttributes& glAttributes, GraphicsCircularBuffer<float>* cb)
 	{
 		for (auto* vertexBuffer : vertexBuffers)
 		{
 			vertexBuffer->bind();
-
-			//xx *= 0.995f;
-			//if (xx <= 0.01f) {
-			//	xx = 1.0f;
-			//}
-
-			/*for (int i = 0; i < 16; i++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					image[i][j] = PixelARGB(1, xx * 255, xx * 128, 20);
-				}
-			}
-
-			texture.loadARGB(*image, 16, 16);*/
 
 			if(!cb->isEmpty())
 			{
@@ -257,7 +194,6 @@ struct Shape
 
 			glAttributes.enable(openGLContext);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-			//glDrawElements(GL_LINES, 2 * 256, GL_UNSIGNED_INT, 0);
 			glAttributes.disable(openGLContext);
 		}
 	}
@@ -267,40 +203,30 @@ struct Shape
 
 
 
-class VUMetre : public Component, public OpenGLRenderer //public DrawablePath ////, public AnimatedAppComponent
+class VUMetre : public Component, public OpenGLRenderer
 {
 public:
 	//==============================================================================
 	VUMetre();
 	~VUMetre() override;
-
 	//==============================================================================
 	void paint(Graphics& g) override;
 	void resized() override;
-	//void update() override;
 	//==============================================================================
-	/** Called before rendering OpenGL, after an OpenGLContext has been associated
-		with this OpenGLRenderer (this component is a OpenGLRenderer).
-		Sets up GL objects that are needed for rendering.
-	 */
 	void newOpenGLContextCreated() override;
-
-	/** Called when done rendering OpenGL, as an OpenGLContext object is closing.
-		Frees any GL objects created during rendering.
-	 */
 	void openGLContextClosing() override;
-
 	void renderOpenGL() override;
-
-	GraphicsCircularBuffer<float>* getCircularBuffer() { return &circularBuffer; }
+	//==============================================================================
+	void setCircularBuffer(GraphicsCircularBuffer<float>* cb) { circularBuffer = cb; }
 
 
 private:
-
+	Label title;
+	//==============================================================================
 	std::unique_ptr<OpenGLShaderProgram> shaderProgram;
-	std::unique_ptr<Shape> shape;
-	std::unique_ptr<Attributes> attributes;
-	std::unique_ptr<Uniforms> uniforms;
+	std::unique_ptr<VUShape> shape;
+	std::unique_ptr<VUAttributes> attributes;
+	std::unique_ptr<VUUniforms> uniforms;
 	const char* vertexShader;
 	const char* fragmentShader;
 	void createShaders();
@@ -312,7 +238,7 @@ private:
 	//==============================================================================
 	void drawBackgroundStuff(float desktopScale);
 	//==============================================================================
-	GraphicsCircularBuffer<float> circularBuffer;
+	GraphicsCircularBuffer<float>* circularBuffer;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VUMetre)
 };
