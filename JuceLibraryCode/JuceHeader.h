@@ -48,7 +48,7 @@
 #if ! JUCE_DONT_DECLARE_PROJECTINFO
 namespace ProjectInfo
 {
-    const char* const  projectName    = "Tests_Juce_OpenGL2";
+    const char* const  projectName    = "JuceOpenGL_Waveform_VUmeter";
     const char* const  companyName    = "";
     const char* const  versionString  = "1.0.0";
     const int          versionNumber  = 0x10000;

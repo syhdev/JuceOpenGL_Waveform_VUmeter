@@ -1,2 +1,2 @@
-# JuceOpenGL_Waveform_VUmeter
+# JuceOpenGL Waveform VUmeter
  Waveform viewer and VU meter example using Juce and OpenGL
