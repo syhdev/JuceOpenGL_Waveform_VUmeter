@@ -166,7 +166,7 @@ struct VUShape
 				SamplesBuffer<float> sb = cb->get();
 				for (int i = 0; i < sb.numSamples; i++)
 				{
-					image[i] = PixelARGB(1, (sb.buffer[i] + 1) * 255 / 2, 128, 0);
+					image[i] = PixelARGB(1, (sb.buffer[i] + 1) * 255 / 2, 0, 0);
 				}
 
 				texture.loadARGB(image, sb.numSamples, 1);
@@ -174,7 +174,7 @@ struct VUShape
 			else {
 				for (int i = 0; i < 16; i++)
 				{
-					image[i] = PixelARGB(1, 255 , 128, 0);
+					image[i] = PixelARGB(1, 255 / 2, 0, 0);
 				}
 
 				texture.loadARGB(image, 16, 1);

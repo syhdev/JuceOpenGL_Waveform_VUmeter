@@ -17,7 +17,7 @@ MainComponent::MainComponent() :
 {
 	// Make sure you set the size of the component after
 	// you add any child components.
-	setSize(800, 600);
+	setSize(1200, 600);
 
 	// Some platforms require permissions to open input channels so request that here
 	if (RuntimePermissions::isRequired(RuntimePermissions::recordAudio)
@@ -122,7 +122,7 @@ void MainComponent::resized()
 	openButton.setBounds(area.removeFromTop(50));
 	playButton.setBounds(area.removeFromTop(50));
 	stopButton.setBounds(area.removeFromTop(50));
-	waveformViewer.setBounds(area.removeFromLeft(300));
+	waveformViewer.setBounds(area.removeFromLeft(400));
 	vuMetre.setBounds(area);
 }
 
