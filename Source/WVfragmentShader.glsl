@@ -2,10 +2,10 @@ R"(
 #version 150
 #extension GL_ARB_explicit_uniform_location : enable
 #extension GL_ARB_explicit_attrib_location : enable
-in vec2 val;
+
 uniform vec2 resolution;
 uniform float numSamples;
-uniform sampler2D myTexture;
+uniform sampler2D audioTexture;
 out vec4 color;
 
 
@@ -22,7 +22,7 @@ void main()
 
     vec2 st = gl_FragCoord.xy / resolution.xy;
 	
-    float data = texture(myTexture, vec2(st.x /* numSamples / resolution.x*/, 0.0)).x;// * 5.0;
+    float data = texture(audioTexture, vec2(st.x /* numSamples / resolution.x*/, 0.0)).x;// * 5.0;
 
 	float y = mix(0.05, .95, (data + 1.0) / 2.0) - 0.5;
 		

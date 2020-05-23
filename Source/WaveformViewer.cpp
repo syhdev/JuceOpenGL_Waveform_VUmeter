@@ -26,18 +26,6 @@ WaveformViewer::WaveformViewer()
 	title.setColour(Label::textColourId, Colours::orange);
 	title.setJustificationType(Justification::left);
 
-
-	//addAndMakeVisible(dp);
-	//path.startNewSubPath(Point<float>(5, 5));
-	//path.lineTo(Point<float>(10, 10));
-	//path.lineTo(Point<float>(10, 20));
-	//path.lineTo(Point<float>(50, 20));
-	//path.lineTo(Point<float>(100, 20));
-	//path.closeSubPath();
-	//dp.setPath(path);
-
-	//setFramesPerSecond(24);
-
 	vertexShader =
 #include "WVvertexShader.glsl"
 		;
@@ -55,71 +43,22 @@ WaveformViewer::~WaveformViewer()
 
 //==============================================================================
 void WaveformViewer::paint(Graphics& g)
-{
-
-
-	//g.setColour(cOpBackground);
-	//g.fillAll();
-
-
-
-	/*g.setColour(Colours::aquamarine);
-	g.drawVerticalLine(xx, 0.0, 50.0);
-
-	xx++;
-
-	if (xx > 100) {
-		xx = 0;
-	}*/
-
-	//g.setColour(Colours::white);
-	//g.drawVerticalLine(20, 0.0, 100.0);
-	//g.drawVerticalLine(40, 0.0, 50.0);
-
-	//DBG("paint");
-
-	//float v;
-	//float voffset = 10.0;
-	//SamplesBuffer<float> sb = circularBuffer->get();
-	//g.setColour(Colours::white);
-	//for (int i = 0; i < sb.numSamples; i++) {
-	//	v = sb.buffer[i];
-	//	g.drawVerticalLine(i, 0.0 + voffset, v * 100.0 + voffset + 3.0);
-	//}
-}
+{}
 
 void WaveformViewer::resized()
 {
 	Rectangle<int> area(getLocalBounds());
 	title.setBounds(area.removeFromTop(30));
-	//dp.setBounds(area);
 }
 
-//void WaveformViewer::update()
-//{
-//}
-
-//void WaveformViewer::changeListenerCallback(ChangeBroadcaster * source)
-//{
-//	repaint();
-//}
 
 void WaveformViewer::newOpenGLContextCreated()
 {
-	DBG("opening GL");
-	// Setup Shaders
 	createShaders();
-
-	// Setup Buffer Objects
-	//glContext.extensions.glGenBuffers(1, &VBO); // Vertex Buffer Object
-	//glContext.extensions.glGenBuffers(1, &EBO); // Vertex Buffer Object
 }
 
 void WaveformViewer::openGLContextClosing()
 {
-	//shaderProgram->release();
-	//shaderProgram = nullptr;
-	DBG("closing GL");
 	shaderProgram.reset();
 	shape.reset();
 	attributes.reset();
@@ -169,7 +108,6 @@ void WaveformViewer::renderOpenGL()
 
 void WaveformViewer::createShaders()
 {
-
 
 	std::unique_ptr<OpenGLShaderProgram> newShaderProgram(new OpenGLShaderProgram(glContext));
 	String statusText;

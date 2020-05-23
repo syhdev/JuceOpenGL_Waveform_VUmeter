@@ -16,26 +16,22 @@
 struct WVVertex
 {
 	float vertex[3];
-	float value[2];
 
-	WVVertex(float vx, float vy, float vz, float valx, float valy)
+	WVVertex(float vx, float vy, float vz)
 	{
 		vertex[0] = vx;
 		vertex[1] = vy;
 		vertex[2] = vz;
-		value[0] = valx;
-		value[1] = valy;
 	}
 };
 
 struct WVAttributes
 {
-	std::unique_ptr<OpenGLShaderProgram::Attribute> vertex, value;
+	std::unique_ptr<OpenGLShaderProgram::Attribute> vertex;
 
 	WVAttributes(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
 	{
 		vertex.reset(createAttribute(openGLContext, shaderProgram, "vertex"));
-		value.reset(createAttribute(openGLContext, shaderProgram, "value"));
 	}
 
 	void enable(OpenGLContext& openGLContext)
@@ -45,18 +41,11 @@ struct WVAttributes
 			openGLContext.extensions.glVertexAttribPointer(vertex->attributeID, 3, GL_FLOAT, GL_FALSE, sizeof(WVVertex), 0);
 			openGLContext.extensions.glEnableVertexAttribArray(vertex->attributeID);
 		}
-
-		if (value.get() != nullptr)
-		{
-			openGLContext.extensions.glVertexAttribPointer(value->attributeID, 2, GL_FLOAT, GL_FALSE, sizeof(WVVertex), (GLvoid*)(sizeof(float) * 3));
-			openGLContext.extensions.glEnableVertexAttribArray(value->attributeID);
-		}
 	}
 
 	void disable(OpenGLContext& openGLContext)
 	{
 		if (vertex.get() != nullptr)       openGLContext.extensions.glDisableVertexAttribArray(vertex->attributeID);
-		if (value.get() != nullptr)         openGLContext.extensions.glDisableVertexAttribArray(value->attributeID);
 	}
 
 private:
@@ -78,8 +67,7 @@ struct WVUniforms
 		projectionMatrix.reset(createUniform(openGLContext, shaderProgram, "projectionMatrix"));
 		viewMatrix.reset(createUniform(openGLContext, shaderProgram, "viewMatrix"));
 		resolution.reset(createUniform(openGLContext, shaderProgram, "resolution"));
-		audioData.reset(createUniform(openGLContext, shaderProgram, "audioData"));
-		texture.reset(createUniform(openGLContext, shaderProgram, "myTexture"));
+		texture.reset(createUniform(openGLContext, shaderProgram, "audioTexture"));
 	}
 
 private:
@@ -99,23 +87,18 @@ private:
 struct WVVertexBuffer
 {
 	GLuint VBO;
-	GLuint EBO;
 	OpenGLContext& openGLContext;
 	Array<WVVertex> vertices;
-	float xx = 1.0;
 
 	WVVertexBuffer(OpenGLContext& context) : openGLContext(context)
 	{
 		openGLContext.extensions.glGenBuffers(1, &VBO);
 		openGLContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-		openGLContext.extensions.glGenBuffers(1, &EBO);
-		openGLContext.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-
-		vertices.add(WVVertex(-1.0, -1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(WVVertex(-1.0, 1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(WVVertex(1.0, 1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(WVVertex(1.0, -1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(WVVertex(-1.0, -1.0, 0.0f));
+		vertices.add(WVVertex(-1.0, 1.0, 0.0f));
+		vertices.add(WVVertex(1.0, 1.0, 0.0f));
+		vertices.add(WVVertex(1.0, -1.0, 0.0f));
 
 
 		openGLContext.extensions.glBufferData(
@@ -128,13 +111,11 @@ struct WVVertexBuffer
 	~WVVertexBuffer()
 	{
 		openGLContext.extensions.glDeleteBuffers(1, &VBO);
-		openGLContext.extensions.glDeleteBuffers(1, &EBO);
 	}
 
 	void bind()
 	{
 		openGLContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		openGLContext.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	}
 };
 
