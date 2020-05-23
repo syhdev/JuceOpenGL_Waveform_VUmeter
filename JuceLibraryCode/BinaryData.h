@@ -8,14 +8,20 @@
 
 namespace BinaryData
 {
-    extern const char*   fragmentShader_glsl;
-    const int            fragmentShader_glslSize = 2286;
+    extern const char*   VUfragmentShader_glsl;
+    const int            VUfragmentShader_glslSize = 1714;
 
-    extern const char*   vertexShader_glsl;
-    const int            vertexShader_glslSize = 359;
+    extern const char*   VUvertexShader_glsl;
+    const int            VUvertexShader_glslSize = 359;
+
+    extern const char*   WVfragmentShader_glsl;
+    const int            WVfragmentShader_glslSize = 1714;
+
+    extern const char*   WVvertexShader_glsl;
+    const int            WVvertexShader_glslSize = 359;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 2;
+    const int namedResourceListSize = 4;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

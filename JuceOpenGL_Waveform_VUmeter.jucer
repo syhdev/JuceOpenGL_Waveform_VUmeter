@@ -10,15 +10,19 @@
             file="Source/WaveformViewer.h"/>
       <FILE id="xr5tAe" name="CircularBuffer.h" compile="0" resource="0"
             file="Source/CircularBuffer.h"/>
-      <FILE id="EFp4I7" name="fragmentShader.glsl" compile="0" resource="1"
-            file="Source/fragmentShader.glsl"/>
-      <FILE id="WUwHBr" name="vertexShader.glsl" compile="0" resource="1"
-            file="Source/vertexShader.glsl"/>
+      <FILE id="EFp4I7" name="VUfragmentShader.glsl" compile="0" resource="1"
+            file="Source/VUfragmentShader.glsl"/>
+      <FILE id="WUwHBr" name="VUvertexShader.glsl" compile="0" resource="1"
+            file="Source/VUvertexShader.glsl"/>
       <FILE id="ZXslUc" name="VUMetre.cpp" compile="1" resource="0" file="Source/VUMetre.cpp"/>
       <FILE id="drVyST" name="VUMetre.h" compile="0" resource="0" file="Source/VUMetre.h"/>
       <FILE id="zLy0uB" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       <FILE id="xvtCPP" name="MainComponent.cpp" compile="1" resource="0"
             file="Source/MainComponent.cpp"/>
+      <FILE id="Ua0kfM" name="WVfragmentShader.glsl" compile="0" resource="1"
+            file="Source/WVfragmentShader.glsl"/>
+      <FILE id="jhUmNe" name="WVvertexShader.glsl" compile="0" resource="1"
+            file="Source/WVvertexShader.glsl"/>
       <FILE id="rorLvv" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
     </GROUP>
   </MAINGROUP>

@@ -39,11 +39,11 @@ WaveformViewer::WaveformViewer()
 	//setFramesPerSecond(24);
 
 	vertexShader =
-#include "vertexShader.glsl"
+#include "WVvertexShader.glsl"
 		;
 
 	fragmentShader =
-#include "fragmentShader.glsl"
+#include "WVfragmentShader.glsl"
 		;
 }
 
@@ -161,21 +161,10 @@ void WaveformViewer::renderOpenGL()
 	if (uniforms->texture.get() != nullptr)
 		uniforms->texture->set((GLint)0);
 
-	//if (uniforms->audioData.get() != nullptr)
-	//{
-	//	SamplesBuffer<float> sb;
-	//	sb = circularBuffer->get();
-	//	//DBG(sb.buffer[0]);
-	//	//FloatVectorOperations::clear(visualizationBuffer, sb.numSamples);
-	//	//FloatVectorOperations::add(visualizationBuffer, sb.buffer.getReadPointer(i, 0), RING_BUFFER_READ_SIZE);
-	//	uniforms->audioData->set((GLfloat*)sb.buffer, sb.numSamples);
-	//}
-
 	shape->draw(glContext, *attributes, circularBuffer);
 
 	// Reset the element buffers so child Components draw correctly
 	glContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glContext.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void WaveformViewer::createShaders()
@@ -219,7 +208,7 @@ Matrix3D<float> WaveformViewer::getProjectionMatrix() const
 Matrix3D<float> WaveformViewer::getViewMatrix() const
 {
 
-	Matrix3D<float> viewMatrix({ 0.0f, 0.0f, -10.0f }); // [4]
+	Matrix3D<float> viewMatrix({ 0.0f, 0.0f, -10.0f });
 
 	return viewMatrix;
 }
@@ -236,31 +225,16 @@ void WaveformViewer::drawBackgroundStuff(float desktopScale)
 		g.setColour(Colours::darkslategrey);
 		g.fillAll();
 
-		/*xx *= 0.995f;
-		if (xx <= 0.01f) {
-			xx = 1.0f;
-		}*/
-
-		/*for (int i = 0; i < 256; i++) {
-			g.setColour(Colours::orange);
-			g.drawVerticalLine(i, sin(xx * i) * 20.0f+50.0f, getHeight());
-		}*/
-
-		/*path.clear();
-
-		path.startNewSubPath(Point<float>(0, getHeight() / 2));
-		for (int i = 0; i < 256; i++) {
-			path.lineTo(Point<float>(2* i, sin(xx * i) * 40.0f + getHeight()/2));
+		g.setColour(Colours::white);
+		for (int i = 0; i < getWidth() / 20; i++)
+		{
+			g.drawVerticalLine(20 * i, 0, getHeight());
 		}
-		path.lineTo(Point<float>(2 * 256, getHeight()));
-		path.lineTo(Point<float>(0, getHeight()));
-		path.closeSubPath();
 
-		PathStrokeType stroke(3.0f);
-		g.setColour(Colours::orange.darker(0.2f));
-		g.strokePath(path, stroke);
-		g.setColour(Colours::orange.withAlpha(0.5f));
-		g.fillPath(path);*/
+		for (int j = 0; j < getHeight() / 20; j++)
+		{
+			g.drawHorizontalLine(20 * j, 0, getWidth());
+		}
 	}
 }
 

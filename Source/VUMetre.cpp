@@ -22,11 +22,11 @@ VUMetre::VUMetre()
 	setSize(800, 600);
 
 	vertexShader =
-#include "vertexShader.glsl"
+#include "VUvertexShader.glsl"
 		;
 
 	fragmentShader =
-#include "fragmentShader.glsl"
+#include "VUfragmentShader.glsl"
 		;
 
 	addAndMakeVisible(title);
@@ -102,7 +102,7 @@ void VUMetre::renderOpenGL()
 	if (uniforms->texture.get() != nullptr)
 		uniforms->texture->set((GLint)0);
 
-	shape->draw(glContext, *attributes, circularBuffer);
+	//shape->draw(glContext, *attributes, *uniforms, circularBuffer);
 
 	// Reset the element buffers so child Components draw correctly
 	glContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -112,27 +112,16 @@ struct WVVertexBuffer
 		openGLContext.extensions.glGenBuffers(1, &EBO);
 		openGLContext.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-		for (int i = 0; i < 256; i++) {
-			vertices.add(WVVertex(i / 256.0f, i / 256.0f, 0.0f, 0.0f, 0.0f));
-		}
+		vertices.add(WVVertex(-1.0, -1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(WVVertex(-1.0, 1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(WVVertex(1.0, 1.0, 0.0f, 0.0f, 0.0f));
+		vertices.add(WVVertex(1.0, -1.0, 0.0f, 0.0f, 0.0f));
 
-
-		int indices[2 * 256 - 2];
-		for (int i = 0; i < 255; i++) {
-			indices[2 * i] = i;
-			indices[2 * i + 1] = i + 1;
-		}
 
 		openGLContext.extensions.glBufferData(
 			GL_ARRAY_BUFFER,
 			static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(WVVertex)),
 			vertices.getRawDataPointer(),
-			GL_STATIC_DRAW);
-
-		openGLContext.extensions.glBufferData(
-			GL_ELEMENT_ARRAY_BUFFER,
-			sizeof(int) * (2 * 256 - 2),
-			indices,
 			GL_STATIC_DRAW);
 	}
 
@@ -147,61 +136,46 @@ struct WVVertexBuffer
 		openGLContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		openGLContext.extensions.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	}
-
-	void setAudioData()
-	{
-		vertices.clear();
-
-		xx *= 0.995f;
-		if (xx <= 0.01f) {
-			xx = 1.0f;
-		}
-
-		//for (int i = 0; i < 256; i++) {
-		//	vertices.add(WVVertex(2* i / 256.0f - 1.0f, sin(xx * i), 0.0f, 0.0f, 0.0f));
-		//}
-
-		vertices.add(WVVertex(-1.0, -1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(WVVertex(-1.0, 1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(WVVertex(1.0, 1.0, 0.0f, 0.0f, 0.0f));
-		vertices.add(WVVertex(1.0, -1.0, 0.0f, 0.0f, 0.0f));
-
-
-		openGLContext.extensions.glBufferData(
-			GL_ARRAY_BUFFER,
-			static_cast<GLsizeiptr> (static_cast<size_t> (vertices.size()) * sizeof(WVVertex)),
-			vertices.getRawDataPointer(),
-			GL_STATIC_DRAW);
-	}
 };
 
 struct WVShape
 {
 	OwnedArray<WVVertexBuffer> vertexBuffers;
 	OpenGLTexture texture;
-	//PixelARGB image[16][16];
 	PixelARGB image[4096];
-	float xx = 1.0f;
 
 	WVShape(OpenGLContext& openGLContext)
 	{
 		vertexBuffers.add(new WVVertexBuffer(openGLContext));
 
-		
-		/*for (int i = 0; i < 16; i++) 
-		{
-			for (int j = 0; j < 16; j++)
-			{
-				image[i][j] = PixelARGB(1, 255, 0, 0);
-			}
-		}*/
-
-		//texture.loadARGB(*image, 16, 16);
-
-
-
 	}
 
+	void setAudioGLSLTexture(GraphicsCircularBuffer<float>* cb)
+	{
+		if (!cb->isEmpty())
+		{
+			SamplesBuffer<float> sb = cb->get();
+			for (int i = 0; i < sb.numSamples; i++)
+			{
+				image[i] = PixelARGB(1, (sb.buffer[i] + 1) * 255 / 2, 128, 0);
+			}
+
+			texture.loadARGB(image, sb.numSamples, 1);
+		}
+		else {
+			for (int i = 0; i < 16; i++)
+			{
+				image[i] = PixelARGB(1, 255, 128, 0);
+			}
+
+			texture.loadARGB(image, 16, 1);
+		}
+
+		texture.bind();
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
 
 	void draw(OpenGLContext& openGLContext, WVAttributes& glAttributes, GraphicsCircularBuffer<float>* cb)
 	{
@@ -209,55 +183,10 @@ struct WVShape
 		{
 			vertexBuffer->bind();
 
-			//xx *= 0.995f;
-			//if (xx <= 0.01f) {
-			//	xx = 1.0f;
-			//}
-
-			/*for (int i = 0; i < 16; i++)
-			{
-				for (int j = 0; j < 16; j++)
-				{
-					image[i][j] = PixelARGB(1, xx * 255, xx * 128, 20);
-				}
-			}
-
-			texture.loadARGB(*image, 16, 16);*/
-
-			/*if(!cb->isEmpty())
-			{
-				SamplesBuffer<float> sb = cb->get();
-				for (int i = 0; i < sb.numSamples; i++)
-				{
-					image[i] = PixelARGB(1, (sb.buffer[i] + 1) * 255 / 2, 128, 0);
-				}
-
-				texture.loadARGB(image, sb.numSamples, 1);
-			}
-			else {*/
-				for (int i = 0; i < 16; i++)
-				{
-					image[i] = PixelARGB(1, 255 , 128, 0);
-				}
-
-				texture.loadARGB(image, 16, 1);
-			//}
-			
-
-			texture.bind();
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-			vertexBuffer->setAudioData();
+			setAudioGLSLTexture(cb);
 
 			glAttributes.enable(openGLContext);
 			glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-			//glDrawElements(GL_LINES, 2 * 256, GL_UNSIGNED_INT, 0);
 			glAttributes.disable(openGLContext);
 		}
 	}
@@ -267,7 +196,7 @@ struct WVShape
 
 
 
-class WaveformViewer : public Component, public OpenGLRenderer //public DrawablePath ////, public AnimatedAppComponent
+class WaveformViewer : public Component, public OpenGLRenderer
 {
 public:
 	//==============================================================================

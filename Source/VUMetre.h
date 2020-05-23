@@ -71,13 +71,14 @@ private:
 
 struct VUUniforms
 {
-	std::unique_ptr<OpenGLShaderProgram::Uniform> projectionMatrix, viewMatrix, audioData, resolution, texture;
+	std::unique_ptr<OpenGLShaderProgram::Uniform> projectionMatrix, viewMatrix, audioData, resolution, texture, numSamples;
 
 	VUUniforms(OpenGLContext& openGLContext, OpenGLShaderProgram& shaderProgram)
 	{
 		projectionMatrix.reset(createUniform(openGLContext, shaderProgram, "projectionMatrix"));
 		viewMatrix.reset(createUniform(openGLContext, shaderProgram, "viewMatrix"));
 		resolution.reset(createUniform(openGLContext, shaderProgram, "resolution"));
+		numSamples.reset(createUniform(openGLContext, shaderProgram, "numSamples"));
 		audioData.reset(createUniform(openGLContext, shaderProgram, "audioData"));
 		texture.reset(createUniform(openGLContext, shaderProgram, "myTexture"));
 	}
@@ -155,7 +156,7 @@ struct VUShape
 	}
 
 
-	void draw(OpenGLContext& openGLContext, VUAttributes& glAttributes, GraphicsCircularBuffer<float>* cb)
+	void draw(OpenGLContext& openGLContext, VUAttributes& glAttributes, VUUniforms& uniforms, GraphicsCircularBuffer<float>* cb)
 	{
 		for (auto* vertexBuffer : vertexBuffers)
 		{
@@ -164,6 +165,10 @@ struct VUShape
 			if(!cb->isEmpty())
 			{
 				SamplesBuffer<float> sb = cb->get();
+
+				if (uniforms.numSamples.get() != nullptr)
+					uniforms.numSamples->set((GLfloat)sb.numSamples);
+
 				for (int i = 0; i < sb.numSamples; i++)
 				{
 					image[i] = PixelARGB(1, (sb.buffer[i] + 1) * 255 / 2, 0, 0);
@@ -185,10 +190,10 @@ struct VUShape
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glEnable(GL_DEPTH_TEST);
-			glDepthFunc(GL_LESS);
+			//glEnable(GL_DEPTH_TEST);
+			/*glDepthFunc(GL_LESS);
 			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);*/
 
 			vertexBuffer->setAudioData();
 
