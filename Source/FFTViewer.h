@@ -16,7 +16,7 @@
 //==============================================================================
 /*
 */
-class FFTViewer    : public Component
+class FFTViewer : public Component, public Timer
 {
 public:
     FFTViewer();
@@ -30,14 +30,20 @@ public:
     //==============================================================================
 
     void setCircularBuffer(GraphicsCircularBuffer<float>* cb) { circularBuffer = cb; }
+    void goForDrawing(bool go);
 
-    void goForDrawing(bool go) { isDrawing = go; }
+    //==============================================================================
+
+    void timerCallback() override;
 
 private:
-    Label title;
+    Label title, numSamplesTitleLabel;
     //==============================================================================
     GraphicsCircularBuffer<float>* circularBuffer;
     bool isDrawing = false;
+    int label = 0;
+    //==============================================================================
+    void computeFFT();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FFTViewer)
 };

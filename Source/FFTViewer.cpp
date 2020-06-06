@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-    FFTViewer.cpp
-    Created: 6 Jun 2020 5:55:52pm
-    Author:  Sylvain
+	FFTViewer.cpp
+	Created: 6 Jun 2020 5:55:52pm
+	Author:  Sylvain
 
   ==============================================================================
 */
@@ -14,26 +14,64 @@
 //==============================================================================
 FFTViewer::FFTViewer()
 {
-    addAndMakeVisible(title);
-    title.setText("FFT", dontSendNotification);
-    title.setColour(Label::textColourId, Colours::orange);
-    title.setJustificationType(Justification::left);
+	addAndMakeVisible(title);
+	title.setText("FFT", dontSendNotification);
+	title.setColour(Label::textColourId, Colours::orange);
+	title.setJustificationType(Justification::left);
 
+	addAndMakeVisible(numSamplesTitleLabel);
+	numSamplesTitleLabel.setText("Num samples in current audio data: ", dontSendNotification);
+	numSamplesTitleLabel.setColour(Label::textColourId, Colours::orange);
+	numSamplesTitleLabel.setJustificationType(Justification::left);
 }
 
 FFTViewer::~FFTViewer()
 {
 }
 
-void FFTViewer::paint (Graphics& g)
+void FFTViewer::goForDrawing(bool go)
 {
-    Rectangle<int> area(getLocalBounds());
-    title.setBounds(area.removeFromTop(30));
+	isDrawing = go;
+	if (isDrawing)
+	{
+		startTimer(100);
+	}
+	else
+	{
+		stopTimer();
+		label = 0;
+		repaint();
+	}
+}
+
+void FFTViewer::paint(Graphics& g)
+{
+	g.setColour(Colours::orange);
+
+	g.drawText(String(label), Rectangle<float>(220, 30, 50, 30), Justification::centred);
 }
 
 void FFTViewer::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
+	Rectangle<int> area(getLocalBounds());
+	title.setBounds(area.removeFromTop(30));
 
+	numSamplesTitleLabel.setBounds(area.removeFromTop(30));
+}
+
+void FFTViewer::timerCallback()
+{
+	computeFFT();
+	repaint();
+}
+
+void FFTViewer::computeFFT()
+{
+	SamplesBuffer<float> sb;
+
+	if (!circularBuffer->isEmpty())
+	{
+		sb = circularBuffer->get();
+		label = sb.numSamples;
+	}
 }
