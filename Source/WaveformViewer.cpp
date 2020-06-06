@@ -77,33 +77,37 @@ void WaveformViewer::renderOpenGL()
 
 	drawBackgroundStuff(desktopScale);
 
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glContext.extensions.glActiveTexture(GL_TEXTURE0);
-	glEnable(GL_TEXTURE_2D);
+	if (isDrawing)
+	{
 
-	glViewport(0, 0, roundToInt(desktopScale * getWidth()), roundToInt(desktopScale * getHeight()));
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glContext.extensions.glActiveTexture(GL_TEXTURE0);
+		glEnable(GL_TEXTURE_2D);
 
-	shaderProgram->use();
+		glViewport(0, 0, roundToInt(desktopScale * getWidth()), roundToInt(desktopScale * getHeight()));
 
-	if (uniforms->projectionMatrix.get() != nullptr)
-		uniforms->projectionMatrix->setMatrix4(getProjectionMatrix().mat, 1, false);
+		shaderProgram->use();
 
-	if (uniforms->viewMatrix.get() != nullptr)
-		uniforms->viewMatrix->setMatrix4(getViewMatrix().mat, 1, false);
+		if (uniforms->projectionMatrix.get() != nullptr)
+			uniforms->projectionMatrix->setMatrix4(getProjectionMatrix().mat, 1, false);
 
-	if (uniforms->resolution.get() != nullptr)
-		uniforms->resolution->set((GLfloat)desktopScale * getWidth(), (GLfloat)desktopScale * getHeight());
+		if (uniforms->viewMatrix.get() != nullptr)
+			uniforms->viewMatrix->setMatrix4(getViewMatrix().mat, 1, false);
 
-	if (uniforms->texture.get() != nullptr)
-		uniforms->texture->set((GLint)0);
+		if (uniforms->resolution.get() != nullptr)
+			uniforms->resolution->set((GLfloat)desktopScale * getWidth(), (GLfloat)desktopScale * getHeight());
 
-	shape->draw(glContext, *attributes, circularBuffer);
+		if (uniforms->texture.get() != nullptr)
+			uniforms->texture->set((GLint)0);
 
-	// Reset the element buffers so child Components draw correctly
-	glContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, 0);
+		shape->draw(glContext, *attributes, circularBuffer);
+
+		// Reset the element buffers so child Components draw correctly
+		glContext.extensions.glBindBuffer(GL_ARRAY_BUFFER, 0);
+	}
 }
 
 void WaveformViewer::createShaders()

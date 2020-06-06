@@ -11,6 +11,7 @@
 #include <JuceHeader.h>
 #include "WaveformViewer.h"
 #include "VUMetre.h"
+#include "FFTViewer.h"
 
 //==============================================================================
 /*
@@ -43,6 +44,13 @@ private:
 		Stopping
 	};
 	//==============================================================================
+	TextButton wvButton;
+	TextButton vuButton;
+	TextButton fftButton;
+	void wvButtonClicked();
+	void vuButtonClicked();
+	void fftButtonClicked();
+	//==============================================================================
 	AudioFormatManager formatManager;
 	std::unique_ptr<AudioFormatReaderSource> readerSource;
 	AudioTransportSource transportSource;
@@ -60,6 +68,8 @@ private:
 	WaveformViewer waveformViewer;
 	VUMetre vuMetre;
 	GraphicsCircularBuffer<float> circularBuffer;
+	//==============================================================================
+	FFTViewer fftViewer;
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)

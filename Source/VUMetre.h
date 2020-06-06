@@ -224,6 +224,8 @@ public:
 	//==============================================================================
 	void setCircularBuffer(GraphicsCircularBuffer<float>* cb) { circularBuffer = cb; }
 
+	void goForDrawing(bool go) { isDrawing = go; }
+
 
 private:
 	Label title;
@@ -244,6 +246,7 @@ private:
 	void drawBackgroundStuff(float desktopScale);
 	//==============================================================================
 	GraphicsCircularBuffer<float>* circularBuffer;
+	bool isDrawing = false;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VUMetre)
 };

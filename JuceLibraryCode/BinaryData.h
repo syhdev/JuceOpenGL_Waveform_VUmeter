@@ -15,10 +15,10 @@ namespace BinaryData
     const int            VUvertexShader_glslSize = 359;
 
     extern const char*   WVfragmentShader_glsl;
-    const int            WVfragmentShader_glslSize = 1714;
+    const int            WVfragmentShader_glslSize = 934;
 
     extern const char*   WVvertexShader_glsl;
-    const int            WVvertexShader_glslSize = 359;
+    const int            WVvertexShader_glslSize = 289;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
     const int namedResourceListSize = 4;

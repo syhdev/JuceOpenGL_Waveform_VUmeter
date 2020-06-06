@@ -4,6 +4,8 @@
               jucerVersion="5.4.7">
   <MAINGROUP id="q47rov" name="JuceOpenGL_Waveform_VUmeter">
     <GROUP id="{A308E3EB-3A37-18D5-F18B-AF6A88F866E0}" name="Source">
+      <FILE id="XvXF4N" name="FFTViewer.cpp" compile="1" resource="0" file="Source/FFTViewer.cpp"/>
+      <FILE id="wohQe8" name="FFTViewer.h" compile="0" resource="0" file="Source/FFTViewer.h"/>
       <FILE id="DxoaKt" name="WaveformViewer.cpp" compile="1" resource="0"
             file="Source/WaveformViewer.cpp"/>
       <FILE id="eLLezS" name="WaveformViewer.h" compile="0" resource="0"
