@@ -18,7 +18,7 @@ MainComponent::MainComponent() :
 {
 	// Make sure you set the size of the component after
 	// you add any child components.
-	setSize(1200, 600);
+	setSize(1200, 800);
 
 	// Some platforms require permissions to open input channels so request that here
 	if (RuntimePermissions::isRequired(RuntimePermissions::recordAudio)
@@ -113,6 +113,8 @@ void MainComponent::prepareToPlay(int samplesPerBlockExpected, double sampleRate
 
 	// You can use this function to initialise any resources you might need,
 	// but be careful - it will be called on the audio thread, not the GUI thread.
+
+	fftViewer.setSampleRate(sampleRate);
 
 	// For more details, see the help for AudioProcessor::prepareToPlay()
 
@@ -250,16 +252,16 @@ void MainComponent::stopButtonClicked()
 
 void MainComponent::wvButtonClicked()
 {
-	waveformViewer.goForDrawing(true);
 	vuMetre.goForDrawing(false);
 	fftViewer.goForDrawing(false);
+	waveformViewer.goForDrawing(true);
 }
 
 void MainComponent::vuButtonClicked()
 {
 	waveformViewer.goForDrawing(false);
-	vuMetre.goForDrawing(true);
 	fftViewer.goForDrawing(false);
+	vuMetre.goForDrawing(true);
 }
 
 void MainComponent::fftButtonClicked()

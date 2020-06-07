@@ -4,6 +4,13 @@
               jucerVersion="5.4.7">
   <MAINGROUP id="q47rov" name="JuceOpenGL_Waveform_VUmeter">
     <GROUP id="{A308E3EB-3A37-18D5-F18B-AF6A88F866E0}" name="Source">
+      <FILE id="YZZzTi" name="_kiss_fft_guts.h" compile="0" resource="0"
+            file="Source/_kiss_fft_guts.h"/>
+      <FILE id="jhaIpO" name="kiss_fft.c" compile="1" resource="0" file="Source/kiss_fft.c"/>
+      <FILE id="otTWxR" name="kiss_fft.h" compile="0" resource="0" file="Source/kiss_fft.h"/>
+      <FILE id="og05q7" name="kiss_fftr.c" compile="1" resource="0" file="Source/kiss_fftr.c"/>
+      <FILE id="bpLYqr" name="kiss_fftr.h" compile="0" resource="0" file="Source/kiss_fftr.h"/>
+      <FILE id="z1zvsA" name="fft.h" compile="0" resource="0" file="Source/fft.h"/>
       <FILE id="XvXF4N" name="FFTViewer.cpp" compile="1" resource="0" file="Source/FFTViewer.cpp"/>
       <FILE id="wohQe8" name="FFTViewer.h" compile="0" resource="0" file="Source/FFTViewer.h"/>
       <FILE id="DxoaKt" name="WaveformViewer.cpp" compile="1" resource="0"
